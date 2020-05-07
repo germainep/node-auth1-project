@@ -1,6 +1,8 @@
 const router = require('express').Router()
 const bcrypt = require('bcryptjs')
 const Users = require('../Users/usersModel')
+const authorized = require('../restricted-middleware')
+
 
 router.post('/register', async ( req, res, next ) => {
   const user = req.body
@@ -23,6 +25,7 @@ router.post('/login', async ( req, res, next ) => {
 
   try {
     if (user && bcrypt.compareSync(password, user.password)) {
+      req.session.user = user
       res.json({ message: `Welcome ${ user.username }` })
     }
     else {
@@ -33,7 +36,13 @@ router.post('/login', async ( req, res, next ) => {
   }
 })
 
-router.get('users', async ( req, res, next ) => {
+router.get('/users', authorized, async ( req, res, next ) => {
+  const users = await Users.getAllUsers()
+  try {
+    res.json(users)
+  } catch (err) {
+    next(err)
+  }
 
 })
 module.exports = router

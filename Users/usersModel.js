@@ -14,7 +14,18 @@ async function findBy ( username ) {
   }
 }
 
+async function getAllUsers () {
+  const users = await db('users')
+      .select('id', 'username')
+  try {
+    return users
+  } catch (err) {
+    console.log(err)
+  }
+}
+
 module.exports = {
   add: add,
   findBy: findBy,
+  getAllUsers
 }
